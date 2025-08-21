@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 char isterm(char *term) {
 	static const char * const nato[] = {
@@ -21,27 +22,50 @@ char isterm(char *term) {
 			n++;
 			t++;
 		}
-		if( *n=='\0' )
+		if( *n=='\0' && *t=='\0' )  // Ensure both strings match entirely
 			return( *nato[x] );
 	}
 	return('\0');
 }
 
-int main() {
-    char phrase[240];
-    char *match;
+int main(int argc, char *argv[]) {
     char ch;
     FILE *nato; 
+    char *filename;
+    int offset = 0;
+    char word[64];
 
-    while( !feof(nato) ) {
-        fgets(phrase, 64, nato);
-        match = strtok(phrase, " ,.!?=()[]{}'\""");
-        while(match) {
-            if( (ch=isterm(match))!='\0' )
-                putchar(ch);
-            match = strtok(NULL, " ,.!?=()[]{}'\""");
+    if( argc<2 ) {
+        fprintf(stderr, "Usage: %s [filename]\n", argv[0]);
+        return(1);
+    } else {
+        filename = argv[1];
+    }
+
+    nato = fopen(filename, "r");
+    if( nato==NULL ) {
+        fprintf(stderr, "Unable to open file %s\n", filename);
+        return(1);
+    }
+
+    while( (ch=fgetc(nato))!=EOF ) {
+        if( isalpha(ch) ) {
+            word[offset] = ch;
+            offset++;
+            if( offset>=64 ) {
+                fprintf(stderr, "Buffer overflow\n");
+                return(1);
+            }
+        } else {
+            if( offset>0 ) {
+                word[offset] = '\0';
+                putchar( isterm(word) );
+                offset = 0;
+            }
         }
     }
+
     putchar('\n');
+
     return(0);
 }
