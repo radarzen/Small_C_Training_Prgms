@@ -6,7 +6,7 @@
 
 #define MAX_INPUT 240
 
-int main(int, char**)
+int main(int, char**);
 
 extern const char * const nato[];
 extern const char * const punc_nums1[];

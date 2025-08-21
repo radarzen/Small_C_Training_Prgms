@@ -46,5 +46,5 @@ char * getNato(char input) {
 }
 
 char getAlpha(char * nato) {
-    return NULL;
+    return ('X');
 }

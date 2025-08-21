@@ -1,7 +1,8 @@
 #include "nato.h"
 
 int main(int argc, char *argv[]) {
-   char phrase[MAX_INPUT];
+   char *phrase[MAX_INPUT];
+   char *result;
    int ch;
    int i=0;
    FILE *n;
@@ -10,13 +11,15 @@ int main(int argc, char *argv[]) {
    if( argc<2 ) {
       printf("Note: to parse text file, use '$ %s [FILENAME.txt]'\n", argv[0]);
       printf("See additional help using '$ %s -h'\n", argv[0]);
-      printf("---------------------------------------------------");
-      printf("Enter a word or pharase: "); 
+      printf("---------------------------------------------------\n");
+      printf("Enter a word or phrase: "); 
       fgets(phrase, MAX_INPUT, stdin);
 
       i = 0;
       while(phrase[i]) {
-         getNato(phrase[i]);
+         result = getNato(*phrase[i]);
+         if(result!=NULL)
+            printf("%s ", result);
          i++;
          if( i==MAX_INPUT )
             break;
@@ -36,8 +39,11 @@ int main(int argc, char *argv[]) {
             ++an;
             continue;
          }
-         while( (ch=fgetc(n))!=EOF )
-            getNato(ch);
+         while( (ch=fgetc(n))!=EOF ) {
+            result = getNato(ch);
+            if( result!=NULL )
+                printf("%s ", result);
+         }
          printf("\n\t\t-----EOF-----\n");
          fclose(n);
          ++an;
