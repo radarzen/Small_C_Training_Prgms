@@ -1,8 +1,8 @@
 #include "nato.h"
 
 int main(int argc, char *argv[]) {
-   char *phrase[MAX_INPUT];
-   char *result;
+   char phrase[MAX_INPUT];
+   const char *result;
    int ch;
    int i=0;
    FILE *n;
@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 
       i = 0;
       while(phrase[i]) {
-         result = getNato(*phrase[i]);
+         result = getNato(phrase[i]);
          if(result!=NULL)
             printf("%s ", result);
          i++;

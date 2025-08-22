@@ -28,7 +28,7 @@ const char * const punc3[] = {
      "<o-brace>", "<v-bar>", "<c-brace>", "<tilde>"
 }; 
 
-char * getNato(char input) {
+const char * getNato(char input) {
   
   if( isalpha(input) ) {
      input = toupper(input);

@@ -13,7 +13,7 @@ extern const char * const punc_nums1[];
 extern const char * const punc2[];
 extern const char * const punc3[];
 
-char * getNato(char input);
+const char * getNato(char input);
 char getAlpha(char * nato);
 
 
