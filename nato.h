@@ -5,6 +5,7 @@
 #include <errno.h>
 
 #define MAX_INPUT 240
+#define ARG_INPUT 16
 
 int main(int, char**);
 

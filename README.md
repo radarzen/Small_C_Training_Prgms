@@ -5,7 +5,7 @@ be able to do as much from the command-line as possible (not have to open and th
 $ nato <br>
  -opens program, provides a brief use description, and then asks for a message to convert to NATO phonetics <br>
 $ nato -w [FILE.txt] <br>
- -opens protram, asks for input that writes to new file.  If no filename given in argument, write to default "nato.txt" in users current directory <br>
+ -opens program, asks for input that writes to new file.  If no filename given in argument, write to default "nato.txt" in users current directory <br>
 $ nato -a [FILE.txt] <br>
  -same as '-w', but appends file instead of write new.  If file doesn't exists, start a new one. <br>
 $ nato -rN (FILE.txt) <br>
