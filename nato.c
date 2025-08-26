@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
 
       /* If user starts program with the -rN argument to open a text file
          for converting to NATO phonetics */
-      if( strcmp(cl_argument_1, "-rN") == 0) {
+      if( strcmp(cl_argument_1, "-rN" ) == 0) {
          int an;
          an = 2;
          while( an<argc ) {
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 
       /* If user starts program with the -w to output NATO phonetics to
          given file, nato.txt if none specified */
-      if( strcmp( cl_argument_1, "-w") == 0 ) {
+      if( strcmp( cl_argument_1, "-w" ) == 0 ) {
          if( argc>2 ) {
             strcpy(filename, argv[2]);
          } else {
@@ -91,13 +91,13 @@ int main(int argc, char *argv[]) {
 
       /* If user starts program with the -a to output NATO phonetics to 
          append given file */
-      if( strcmp( cl_argument_1, "-a") == 0 ) {
+      if( strcmp( cl_argument_1, "-a" ) == 0 ) {
          if( argc>2 ) {
             strcpy(filename, argv[2]);
          } else {
             snprintf(filename, 128, "%s/nato.txt", getenv("PWD"));
          }
-         printf("Opening %s...", filename);
+         printf("Opening %s...\n\n", filename);
          fp = fopen(filename, "a+");
          if( fp==NULL ) {
             perror("Failed to open file for edit");
@@ -117,6 +117,23 @@ int main(int argc, char *argv[]) {
                break; 
             }
          fclose(fp);
+      }
+
+      /* If user starts program with the -rF for reading a file and 
+         converting from NATO phonetics back to unencoded text */
+      if( strcmp( cl_argument_1, "-rF" ) == 0 ) {
+         if( argc>2 ) {
+            strcpy(filename, argv[2]);
+         } else {
+            snprintf(filename, 128, "%s/nato.txt", getenv("PWD"));
+         }
+         printf("Opening %s...\n\n", filename);
+         fp = fopen(filename, "r");
+         if( fp==NULL ) {
+            perror("Failed to open file for edit");
+            exit(EXIT_FAILURE);
+         }
+
       }
    }
 

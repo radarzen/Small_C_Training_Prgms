@@ -46,5 +46,7 @@ const char * getNato(char input) {
 }
 
 char getAlpha(char * nato) {
+   char ch;
+   while( ch=fgetc(fp))
     return ('X');
 }
