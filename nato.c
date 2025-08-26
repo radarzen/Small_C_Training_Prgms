@@ -2,22 +2,35 @@
 
 int main(int argc, char *argv[]) {
    char phrase[MAX_INPUT];
+   char word[WORDS];
    const char *result;
    char filename[128];
    int ch;
    int i=0;
+   int piped_in=0;
+   int offset=0;
    FILE *fp;
    int err_no=0;
    char cl_argument_1[ARG_INPUT];
+   char letter;
 
    /* If user starts program without arguments */
    if( argc<2 ) {
-      printf("Note: to parse text file, use '$ %s [FILENAME.txt]'\n", argv[0]);
-      printf("See additional help using '$ %s -h'\n", argv[0]);
-      printf("---------------------------------------------------\n");
-      printf("Enter a word or phrase: "); 
-      fgets(phrase, MAX_INPUT, stdin);
 
+      /* Check stdin for data piped in from another program first */
+      while (fgets(phrase, sizeof(phrase), stdin) != NULL)
+         piped_in = 1;
+      
+      /* If no data piped in, get user input */
+      if( piped_in==0 ) {
+         printf("Note: to parse text file, use '$ %s [FILENAME.txt]'\n", argv[0]);
+         printf("See additional help using '$ %s -h'\n", argv[0]);
+         printf("---------------------------------------------------\n");
+         printf("Enter a word or phrase: "); 
+         fgets(phrase, MAX_INPUT, stdin);
+      }
+
+      /* Convert input to NATO phonetics */
       i = 0;
       while(phrase[i]) {
          result = getNato(phrase[i]);
@@ -85,7 +98,8 @@ int main(int argc, char *argv[]) {
             i++;
             if( i==MAX_INPUT )
                break; 
-            }
+         }
+         putchar('\n');
          fclose(fp);
       }
 
@@ -130,8 +144,23 @@ int main(int argc, char *argv[]) {
          printf("Opening %s...\n\n", filename);
          fp = fopen(filename, "r");
          if( fp==NULL ) {
-            perror("Failed to open file for edit");
+            perror("Failed to open a file for reading");
             exit(EXIT_FAILURE);
+         }
+         while( (ch=fgetc(fp)) != EOF) {
+            offset = 0;
+            while( ch != ' ' && ch != '\n' && ch != '\t' && offset < WORDS - 1) {
+               word[offset] = ch;
+               ++offset;
+               ch = fgetc(fp);  //read next char
+            }
+            word[offset] = '\0';
+            if(offset > 0) {  // Only process if we actually read a word
+               printf("Searching for [%s]\n", word);
+               letter = getAlpha(word);
+               
+               printf("%c", letter);
+            }
          }
 
       }

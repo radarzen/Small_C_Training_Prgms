@@ -2,32 +2,37 @@
 
 // Define the nato array
 const char * const nato[] = {
-     "Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot",
-     "Golf", "Hotel", "India", "Juliette", "Kilo", "Lima", 
-     "Mike", "November", "Oscar", "Papa", "Quebec", "Romeo",
-     "Sierra", "Tango", "Uniform", "Victor", "Whiskey", 
-     "Xray", "Yankee", "Zulu"
+   "Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot",
+   "Golf", "Hotel", "India", "Juliette", "Kilo", "Lima", 
+   "Mike", "November", "Oscar", "Papa", "Quebec", "Romeo",
+   "Sierra", "Tango", "Uniform", "Victor", "Whiskey", 
+   "Xray", "Yankee", "Zulu"
 };
 
 const char * const punc_nums1[] = {
-     "<space>", "<exclemation>", "<d-quote>", "<num>", "<dollar>",
-     "<percent>", "<ampersand>", "<s-quote>", "<o-parenthesis>",
-     "<c-parenthesis>", "<asterisk>", "<plus>", "<comma>",
-     "<hyphen>", "<dot>", "<slash>", "Zero", "One", "Two", "Tree",
-     "Fower", "Fife", "Six", "Seven", "Eight", "Niner", "<colon>",
-     "<semi-colon>", "<o-angle-brkt>", "<equals>", 
-     "<c-angle-brkt>", "<question>", "<at-sign>"
+   "<space>", "<exclemation>", "<d-quote>", "<num>", "<dollar>",
+   "<percent>", "<ampersand>", "<s-quote>", "<o-parenthesis>",
+   "<c-parenthesis>", "<asterisk>", "<plus>", "<comma>",
+   "<hyphen>", "<dot>", "<slash>", "Zero", "One", "Two", "Tree",
+   "Fower", "Fife", "Six", "Seven", "Eight", "Niner", "<colon>",
+   "<semi-colon>", "<o-angle-brkt>", "<equals>", 
+   "<c-angle-brkt>", "<question>", "<at-sign>"
 };
 
 const char * const punc2[] = {
-     "<o-brkt>", "<backslash>", "<c-brkt>", "<caret>", 
-     "<underscore>", "<back-tic>"
+   "<o-brkt>", "<backslash>", "<c-brkt>", "<caret>", 
+   "<underscore>", "<back-tic>"
 };
 
 const char * const punc3[] = {
-     "<o-brace>", "<v-bar>", "<c-brace>", "<tilde>"
+   "<o-brace>", "<v-bar>", "<c-brace>", "<tilde>"
 }; 
 
+const char * const * const array_pointers[] = {
+   nato, punc_nums1, punc2, punc3
+};
+
+/* functions */
 const char * getNato(char input) {
   
   if( isalpha(input) ) {
@@ -45,8 +50,29 @@ const char * getNato(char input) {
   return(NULL);     // Return NULL if unsupported character
 }
 
-char getAlpha(char * nato) {
-   char ch;
-   while( ch=fgetc(fp))
-    return ('X');
+char getAlpha(char * nato_rev) {
+   int i = 0, j = 0;
+   const char *check_word = nato_rev;
+   const char *n;
+   size_t num_elements;
+   size_t num_arrays;
+   int ascii_start[]={ 65, 32, 91, 123 };
+
+   num_arrays = sizeof(array_pointers) / sizeof(array_pointers[0]);
+
+   for(i=0; i<num_arrays; i++) {
+      num_elements = sizeof(array_pointers[i]) / sizeof(array_pointers[i][0]);
+      for(j=0; j<num_elements; j++) {
+         n = array_pointers[i][j];
+         while( *n!='\0' ) {
+            if( (*n|0x20)!=(*check_word|0x20) )
+               break;
+            n++;
+            check_word++;
+         }
+         if( *n=='\0' && *check_word=='\0' )
+            return(j + ascii_start[i]);
+      }
+   }
+    return ('?');
 }
