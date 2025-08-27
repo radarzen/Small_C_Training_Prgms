@@ -3,10 +3,12 @@
 #include <ctype.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #define MAX_INPUT 256
 #define WORDS 64
-#define ARG_INPUT 16
+#define ARG_INPUT 256
 
 int main(int, char**);
 

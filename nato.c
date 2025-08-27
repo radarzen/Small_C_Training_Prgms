@@ -8,26 +8,53 @@ int main(int argc, char *argv[]) {
    int ch;
    int i=0;
    int piped_in=0;
+   char piped_chars[MAX_INPUT];
    int offset=0;
    FILE *fp;
    int err_no=0;
-   char cl_argument_1[ARG_INPUT];
    char letter;
+   size_t len;
+   struct stat sb;
+   char **cl_arguments = malloc( argc*sizeof(char *) );
+   if( cl_arguments==NULL ) {
+      perror( "Failed to allocate memory");
+      return EXIT_FAILURE;
+   }
+
+   /* make copy of commandline argument to cl_arguments array */
+   for(i=0; i<argc; i++) {
+      cl_arguments[i] = strdup(argv[i]);
+      if( cl_arguments[i]==NULL ) {
+         perror("Failed to copy arguments");
+         /* free previously allocated memory */
+         for (int j=0; j<i; j++) {
+            free(cl_arguments[j]);
+         }
+         free(cl_arguments);
+         return EXIT_FAILURE;
+      }
+   }
+   
+
+   /* check stdin for data piped in from another program */
+   if( fstat(STDIN_FILENO, &sb)==0 && S_ISFIFO(sb.st_mode) ) {
+      while(fgets(piped_chars, sizeof(piped_chars), stdin) != NULL) {
+         piped_in = 1;
+      }
+   }
 
    /* If user starts program without arguments */
    if( argc<2 ) {
 
-      /* Check stdin for data piped in from another program first */
-      while (fgets(phrase, sizeof(phrase), stdin) != NULL)
-         piped_in = 1;
-      
       /* If no data piped in, get user input */
-      if( piped_in==0 ) {
-         printf("Note: to parse text file, use '$ %s [FILENAME.txt]'\n", argv[0]);
-         printf("See additional help using '$ %s -h'\n", argv[0]);
+      if( !piped_in ) {
+         printf("Note: to parse text file, use '$ %s -rN [FILENAME.txt]'\n", cl_arguments[0]);
+         printf("See additional help using '$ %s -h'\n", cl_arguments[0]);
          printf("---------------------------------------------------\n");
          printf("Enter a word or phrase: "); 
          fgets(phrase, MAX_INPUT, stdin);
+      } else {
+         strcpy(phrase, piped_chars);
       }
 
       /* Convert input to NATO phonetics */
@@ -44,17 +71,119 @@ int main(int argc, char *argv[]) {
    }
 
    if( argc>=2 ) {
-      strcpy(cl_argument_1, argv[1]);
+
+      /* If user starts program with the -c to convert NATO phonetics
+         to regular text*/
+      if( strcmp( cl_arguments[1], "-c") == 0) {
+         if( argc>2 ) {
+            strcpy(phrase, cl_arguments[2]);
+         } else if( piped_in ) {
+            strcpy(phrase, piped_chars);
+         } else {
+            printf("Note: to parse text file, use '$ %s -rF [FILENAME.txt]'\n", cl_arguments[0]);
+            printf("See additional help using '$ %s -h'\n", cl_arguments[0]);
+            printf("---------------------------------------------------\n");
+            printf("Enter NATO phonetics to convert back to text: "); 
+            fgets(phrase, MAX_INPUT, stdin);
+         }
+
+         len = strlen(phrase);
+         offset = 0;
+         for(i=0; i<len; i++) {
+            ch = phrase[i];
+            if( ch!=' ' && ch!='\n' && ch!='\t' && offset<WORDS-1) {
+               word[offset] = ch;
+               ++offset;
+            } else {
+               word[offset] = '\0';
+               if( offset>1 ) {
+                  letter = getAlpha(word);
+                  printf("%c", letter);
+               }                  
+               offset = 0;
+            }
+         }
+         putchar('\n');
+      }
+
+      /* If user starts program with the -w to output NATO phonetics to
+         given file, nato.txt if none specified */
+      if( strcmp( cl_arguments[1], "-w" ) == 0 ) {
+         if( argc>2 ) {
+            strcpy(filename, cl_arguments[2]);
+         } else {
+            snprintf(filename, 128, "%s/nato.txt", getenv("PWD"));
+         }
+         printf("Opening %s...\n", filename);
+         fp = fopen(filename, "w");
+         if( fp==NULL ) {
+            perror("Failed to open file for edit");
+            exit(EXIT_FAILURE);
+         }
+
+         if( !piped_in ) {
+            printf("Enter a word or phrase: "); 
+            fgets(phrase, MAX_INPUT, stdin);
+         } else {
+            strcpy(phrase, piped_chars);
+         }
+
+         i = 0;
+         while(phrase[i]) {
+            result = getNato(phrase[i]);
+            if(result!=NULL)
+               fprintf(fp, "%s ", result);
+            i++;
+            if( i==MAX_INPUT )
+               break; 
+         }
+         putchar('\n');
+         fclose(fp);
+      }
+
+      /* If user starts program with the -a to output NATO phonetics to 
+         append given file */
+      if( strcmp( cl_arguments[1], "-a" ) == 0 ) {
+         if( argc>2 ) {
+            strcpy(filename, cl_arguments[2]);
+         } else {
+            snprintf(filename, 128, "%s/nato.txt", getenv("PWD"));
+         }
+         printf("Opening %s...\n", filename);
+         fp = fopen(filename, "a+");
+         if( fp==NULL ) {
+            perror("Failed to open file for edit");
+            exit(EXIT_FAILURE);
+         }
+
+         if( !piped_in ) {
+            printf("Enter a word or phrase: "); 
+            fgets(phrase, MAX_INPUT, stdin);
+         } else {
+            strcpy(phrase, piped_chars);
+         }
+         
+         i = 0;
+         while(phrase[i]) {
+            result = getNato(phrase[i]);
+            if(result!=NULL)
+               fprintf(fp, "%s ", result);
+            i++;
+            if( i==MAX_INPUT )
+               break; 
+            }
+         fclose(fp);
+      }
 
       /* If user starts program with the -rN argument to open a text file
          for converting to NATO phonetics */
-      if( strcmp(cl_argument_1, "-rN" ) == 0) {
+      if( strcmp(cl_arguments[1], "-rN" ) == 0) {
          int an;
          an = 2;
          while( an<argc ) {
-            fp = fopen(argv[an], "r");
+            fp = fopen(cl_arguments[an], "r");
             if( fp==NULL ) {
-               fprintf(stderr, "Error opening file %s", argv[an]);
+               fprintf(stderr, "Error opening file %s", cl_arguments[an]);
                perror("Failure");
                exit(EXIT_FAILURE);
                err_no = 1;
@@ -72,76 +201,15 @@ int main(int argc, char *argv[]) {
          }
       }
 
-      /* If user starts program with the -w to output NATO phonetics to
-         given file, nato.txt if none specified */
-      if( strcmp( cl_argument_1, "-w" ) == 0 ) {
-         if( argc>2 ) {
-            strcpy(filename, argv[2]);
-         } else {
-            snprintf(filename, 128, "%s/nato.txt", getenv("PWD"));
-         }
-         printf("Opening %s...", filename);
-         fp = fopen(filename, "w");
-         if( fp==NULL ) {
-            perror("Failed to open file for edit");
-            exit(EXIT_FAILURE);
-         }
-
-         printf("Enter a word or phrase: "); 
-         fgets(phrase, MAX_INPUT, stdin);
-
-         i = 0;
-         while(phrase[i]) {
-            result = getNato(phrase[i]);
-            if(result!=NULL)
-               fprintf(fp, "%s ", result);
-            i++;
-            if( i==MAX_INPUT )
-               break; 
-         }
-         putchar('\n');
-         fclose(fp);
-      }
-
-      /* If user starts program with the -a to output NATO phonetics to 
-         append given file */
-      if( strcmp( cl_argument_1, "-a" ) == 0 ) {
-         if( argc>2 ) {
-            strcpy(filename, argv[2]);
-         } else {
-            snprintf(filename, 128, "%s/nato.txt", getenv("PWD"));
-         }
-         printf("Opening %s...\n\n", filename);
-         fp = fopen(filename, "a+");
-         if( fp==NULL ) {
-            perror("Failed to open file for edit");
-            exit(EXIT_FAILURE);
-         }
-
-         printf("Enter a word or phrase: "); 
-         fgets(phrase, MAX_INPUT, stdin);
-
-         i = 0;
-         while(phrase[i]) {
-            result = getNato(phrase[i]);
-            if(result!=NULL)
-               fprintf(fp, "%s ", result);
-            i++;
-            if( i==MAX_INPUT )
-               break; 
-            }
-         fclose(fp);
-      }
-
       /* If user starts program with the -rF for reading a file and 
          converting from NATO phonetics back to unencoded text */
-      if( strcmp( cl_argument_1, "-rF" ) == 0 ) {
+      if( strcmp( cl_arguments[1], "-rF" ) == 0 ) {
          if( argc>2 ) {
-            strcpy(filename, argv[2]);
+            strcpy(filename, cl_arguments[2]);
          } else {
             snprintf(filename, 128, "%s/nato.txt", getenv("PWD"));
          }
-         printf("Opening %s...\n\n", filename);
+         printf("Opening %s...\n", filename);
          fp = fopen(filename, "r");
          if( fp==NULL ) {
             perror("Failed to open a file for reading");
@@ -156,15 +224,19 @@ int main(int argc, char *argv[]) {
             }
             word[offset] = '\0';
             if(offset > 0) {  // Only process if we actually read a word
-               printf("Searching for [%s]\n", word);
-               letter = getAlpha(word);
-               
+               letter = getAlpha(word);               
                printf("%c", letter);
             }
          }
-
+         putchar('\n');
       }
    }
+
+   /* free dynamically allocated memory */
+   for (i=0; i<argc; i++) {
+      free(cl_arguments[i]);
+   }
+   free(cl_arguments);
 
    return err_no;
 }

@@ -1,4 +1,4 @@
-nato program:  I want to combine all I've learned so far and make the nato program include both encoding (to NATO phonetic alphabetic terms)
+ nato program:  I want to combine all I've learned so far and make the nato program include both encoding (to NATO phonetic alphabetic terms)
 and decoding (converting NATO phonetic terms back to english/origional text).  I want to be able to write, append, and read files.  I want to 
 be able to do as much from the command-line as possible (not have to open and then select options).  The following is what I'm thinking so far:
 
@@ -14,7 +14,7 @@ $ nato -rF [FILE.txt] <br>
  -read file for converting From NATO.  Use "nato.txt" if no file specified.  if fail, request text input from user. <br>
 $ nato "message" <br>
  -convert "message" to NATO phonetics and dump to screen. <br>
-$ nato "message" -[w|a] [FILE.txt] <br>
+$ nato -[w|a] [FILE.txt] "message" <br>
  -convert "message" and dump to file specified (or nato.txt if none given) and exit program. <br>
 $ nato -c "NATO PHONETICS" <br>
  -convert from NATO phonetics and dump to screen <br>
