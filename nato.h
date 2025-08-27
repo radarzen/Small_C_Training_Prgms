@@ -6,7 +6,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define MAX_INPUT 256
+#define MAX_INPUT 512
 #define WORDS 64
 #define ARG_INPUT 256
 
