@@ -1,5 +1,15 @@
- nato program:  
- I want to combine all I've learned so far and make the nato program include both encoding (to NATO phonetic alphabetic terms) and decoding (converting NATO phonetic terms back to english/origional text).  I want to be able to write, append, and read files.  I want to be able to do as much from the command-line as possible (not have to open and then select options).  The following is what I'm thinking so far:
+ greetings program:
+ I didn't think the formula in the book was very accurate.  It wasn't showing the current moon phase correctly.  So I found a more accurate formula online and incorporated it.  I also started consolidating functions and definitions to my own headerfile to clean up the main source file a little.  I saw another programmer do that and I liked it.
+
+-------------------------------------------------------------------- <br>
+
+fortune program:
+Experimented a little with file-handling.  Basic program and I had some ideas to make it a little more advanced, but decided not to for now.  I did add commandline arguments to use the program against a different text file than default if the user chooses.  That's about it.
+
+-------------------------------------------------------------------- <br>
+
+nato program:  
+I want to combine all I've learned so far and make the nato program include both encoding (to NATO phonetic alphabetic terms) and decoding (converting NATO phonetic terms back to english/origional text).  I want to be able to write, append, and read files.  I want to be able to do as much from the command-line as possible (not have to open and then select options).  The following is what I'm thinking so far:
 
 $ nato <br>
  -opens program, provides a brief use description, and then asks for a message to convert to NATO phonetics <br>
