@@ -68,9 +68,9 @@ char getAlpha(char * nato_rev) {
 
    num_arrays = sizeof(array_pointers) / sizeof(array_pointers[0]);
 
-   for(i=0; i<num_arrays; i++) {
+   for(i=0; (unsigned long int) i<num_arrays; i++) {
       num_elements = array_sizes[i];
-      for(j=0; j<num_elements; j++) {
+      for(j=0; (unsigned long int) j<num_elements; j++) {
          n = array_pointers[i][j];
          check_word = nato_rev;  /* reset for each candidate */
          while( *n!='\0' ) {

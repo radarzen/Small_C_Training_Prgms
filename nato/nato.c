@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
 
          len = strlen(phrase);
          offset = 0;
-         for(i=0; i<len; i++) {
+         for(i=0; (unsigned long int) i<len; i++) {
             ch = phrase[i];
             if( ch!=' ' && ch!='\n' && ch!='\t' && offset<WORDS-1) {
                word[offset] = ch;
@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
 
       /* If user starts program with the -a to output NATO phonetics to 
          append given file */
-      if( strcmp( cl_arguments[1], "-a" ) == 0 ) {
+      if( strcmp( cl_arguments[1], "-a+" ) == 0 ) {
          if( argc>4 ) {
          /* this would denote an error, probably indicating user forgot to encapsulate
             imput text from the command-line */
@@ -262,6 +262,14 @@ int main(int argc, char *argv[]) {
             }
          }
          putchar('\n');
+      }
+
+      /* help functions */
+      if( strcmp( cl_arguments[1], "-h" ) == 0 ) {
+         getHelp();
+      }
+      if( strcmp( cl_arguments[1], "--help" ) == 0) {
+         getHelpExtended();
       }
 
       /* If user starts program with just a message argument */
